@@ -3,7 +3,7 @@ package com.yss.vert.jdbc;
 
 import io.vertx.core.json.JsonObject;
 
-public class Whisky {
+public class Person {
 
   private final int id;
 
@@ -11,23 +11,23 @@ public class Whisky {
 
   private String origin;
 
-  public Whisky(String name, String origin) {
+  public Person(String name, String origin) {
     this.name = name;
     this.origin = origin;
     this.id = -1;
   }
 
-  public Whisky(JsonObject json) {
+  public Person(JsonObject json) {
     this.name = json.getString("NAME");
     this.origin = json.getString("ORIGIN");
     this.id = json.getInteger("ID");
   }
 
-  public Whisky() {
+  public Person() {
     this.id = -1;
   }
 
-  public Whisky(int id, String name, String origin) {
+  public Person(int id, String name, String origin) {
     this.id = id;
     this.name = name;
     this.origin = origin;

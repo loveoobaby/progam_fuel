@@ -75,6 +75,7 @@
                                         <mainClass>${profiles.mainClass}</mainClass>
                                     </transformer>
                                 </transformers>
+                                <createDependencyReducedPom>false</createDependencyReducedPom>
                             </configuration>
                         </execution>
                     </executions>
@@ -117,10 +118,24 @@
             </activation>
         </profile>
         <profile>
-            <id>eventbus</id>
+            <id>p2p</id>
             <properties>
-                <profiles.mainClass>com.yss.vert.eventbus.</profiles.mainClass>
+                <profiles.mainClass>com.yss.vert.eventbus.p2p.P2P</profiles.mainClass>
                 <profiles.jarName>vertx-eventbus</profiles.jarName>
+            </properties>
+        </profile>
+        <profile>
+            <id>pubsub</id>
+            <properties>
+                <profiles.mainClass>com.yss.vert.eventbus.pubsub.PubSub</profiles.mainClass>
+                <profiles.jarName>vertx-eventbus</profiles.jarName>
+            </properties>
+        </profile>
+        <profile>
+            <id>fileupload</id>
+            <properties>
+                <profiles.mainClass>com.yss.vert.fileupload.UploadServer</profiles.mainClass>
+                <profiles.jarName>vertx-fileupload</profiles.jarName>
             </properties>
         </profile>
     </profiles>
