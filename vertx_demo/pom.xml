@@ -132,10 +132,10 @@
             </properties>
         </profile>
         <profile>
-            <id>fileupload</id>
+            <id>http</id>
             <properties>
-                <profiles.mainClass>com.yss.vert.fileupload.UploadServer</profiles.mainClass>
-                <profiles.jarName>vertx-fileupload</profiles.jarName>
+                <profiles.mainClass>com.yss.vert.http.HttpServer</profiles.mainClass>
+                <profiles.jarName>vertx-http</profiles.jarName>
             </properties>
         </profile>
     </profiles>
