@@ -9,9 +9,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
-/*
- * @author <a href="http://tfox.org">Tim Fox</a>
- */
+
 public class HelloLatery extends AbstractVerticle {
 
     Logger logger = LoggerFactory.getLogger(HelloLatery.class);

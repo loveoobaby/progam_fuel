@@ -110,18 +110,19 @@
             <id>jdbc</id>
             <properties>
                 <profiles.mainClass>com.yss.vert.jdbc.JdbcVerticle</profiles.mainClass>
-                <profiles.jarName>jdbc</profiles.jarName>
+                <profiles.jarName>vertx-jdbc</profiles.jarName>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
-        <!--<profile>-->
-            <!--<id>prod</id>-->
-            <!--<properties>-->
-                <!--<profiles.active>prod</profiles.active>-->
-            <!--</properties>-->
-        <!--</profile>-->
+        <profile>
+            <id>eventbus</id>
+            <properties>
+                <profiles.mainClass>com.yss.vert.eventbus.</profiles.mainClass>
+                <profiles.jarName>vertx-eventbus</profiles.jarName>
+            </properties>
+        </profile>
     </profiles>
 
 
