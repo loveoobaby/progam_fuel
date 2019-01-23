@@ -137,7 +137,7 @@
                 <profiles.mainClass>com.yss.vert.http.HttpServer</profiles.mainClass>
                 <profiles.jarName>vertx-http</profiles.jarName>
             </properties>
-        </profile>
+        </profile> 
     </profiles>
 
 
