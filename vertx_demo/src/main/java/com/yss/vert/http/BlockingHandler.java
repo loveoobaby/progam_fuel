@@ -3,7 +3,7 @@ package com.yss.vert.http;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
-public class BlockingHander {
+public class BlockingHandler {
 
     public static void hander(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();

@@ -3,7 +3,7 @@ package com.yss.vert.http;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
-public class ChainHander {
+public class ChainHandler {
 
     public static void hander1(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();

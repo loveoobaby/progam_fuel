@@ -3,7 +3,7 @@ package com.yss.vert.http;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.RoutingContext;
 
-public class FileUploadHander {
+public class FileUploadHandler {
 
 
     public static void hander(RoutingContext routingContext) {

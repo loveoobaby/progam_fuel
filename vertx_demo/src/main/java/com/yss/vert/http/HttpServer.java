@@ -46,21 +46,27 @@ public class HttpServer extends AbstractVerticle {
         {
             // File upload demo
             router.route("/static/*").handler(StaticHandler.create().setWebRoot("fileupload"));
-            router.route("/form").handler(FileUploadHander::hander);
+            router.route("/form").handler(FileUploadHandler::hander);
         }
 
         {
             //Handling requests and calling the next handler
-            Route route = router.route("/hander/chain");
-            route.handler(ChainHander::hander1);
-            route.handler(ChainHander::hander2);
-            route.handler(ChainHander::hander3);
+            Route route = router.route("/handler/chain");
+            route.handler(ChainHandler::hander1);
+            route.handler(ChainHandler::hander2);
+            route.handler(ChainHandler::hander3);
         }
 
         {
             // Using blocking handlers
-            Route route = router.route("/hander/block");
-            route.blockingHandler(BlockingHander::hander, false);
+            Route route = router.route("/handller/block");
+            route.blockingHandler(BlockingHandler::hander, false);
+        }
+
+        {
+            // Capturing path parameters
+            Route route = router.route(HttpMethod.GET, "/handler/param/:param1/:param2");
+            route.handler(CaptureParamHandler::handerPathParam);
         }
 
         vertx.createHttpServer().requestHandler(router).listen(8080);
