@@ -4,10 +4,14 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.CorsHandler;
-import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.Session;
+import io.vertx.ext.web.handler.*;
+import io.vertx.ext.web.sstore.LocalSessionStore;
+import io.vertx.ext.web.sstore.SessionStore;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +28,7 @@ public class HttpServer extends AbstractVerticle {
 
         Router router = Router.router(vertx);
 
-        // CROS
+        // CORS
         Set<String> allowedHeaders = new HashSet<>();
         allowedHeaders.add("x-requested-with");
         allowedHeaders.add("Access-Control-Allow-Origin");
@@ -67,6 +71,40 @@ public class HttpServer extends AbstractVerticle {
             // Capturing path parameters
             Route route = router.route(HttpMethod.GET, "/handler/param/:param1/:param2");
             route.handler(CaptureParamHandler::handerPathParam);
+        }
+
+        {
+            // Request body handling
+            router.route().handler(BodyHandler.create().setBodyLimit(10240));
+        }
+
+        {
+            // Handling cookies
+            router.route().handler(CookieHandler.create());
+            router.route("some/path/").handler(routingContext -> {
+                Cookie someCookie = routingContext.getCookie("mycookie");
+                String cookieValue = someCookie.getValue();
+                routingContext.addCookie(Cookie.cookie("othercookie", "somevalue"));
+            });
+        }
+
+        {
+            // Handing Session
+            router.route().handler(CookieHandler.create());
+            SessionStore store = LocalSessionStore.create(vertx);
+            //set timeout 10mins
+            SessionHandler sessionHandler = SessionHandler.create(store).setSessionTimeout(10*60*1000);
+            router.route().handler(sessionHandler);
+            router.route("/handler/session").handler(routingContext -> {
+                Session session = routingContext.session();
+                session.put("foo", "bar");
+                int age = session.get("age");
+                JsonObject obj = session.remove("myobj");
+            });
+        }
+
+        {
+            router.route("/static/*").handler(StaticHandler.create());
         }
 
         vertx.createHttpServer().requestHandler(router).listen(8080);
