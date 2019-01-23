@@ -51,13 +51,17 @@ public class HttpServer extends AbstractVerticle {
 
         {
             //Handling requests and calling the next handler
-            Route route = router.route("/chain/hander");
+            Route route = router.route("/hander/chain");
             route.handler(ChainHander::hander1);
             route.handler(ChainHander::hander2);
             route.handler(ChainHander::hander3);
         }
 
-
+        {
+            // Using blocking handlers
+            Route route = router.route("/hander/block");
+            route.blockingHandler(BlockingHander::hander, false);
+        }
 
         vertx.createHttpServer().requestHandler(router).listen(8080);
     }
