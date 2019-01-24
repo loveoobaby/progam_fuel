@@ -138,6 +138,13 @@
                 <profiles.jarName>vertx-http</profiles.jarName>
             </properties>
         </profile>
+        <profile>
+            <id>https</id>
+            <properties>
+                <profiles.mainClass>com.yss.vert.https.HTTPS</profiles.mainClass>
+                <profiles.jarName>vertx-https</profiles.jarName>
+            </properties>
+        </profile>
     </profiles>
 
 
