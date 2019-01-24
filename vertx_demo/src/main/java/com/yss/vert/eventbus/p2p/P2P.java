@@ -1,5 +1,7 @@
 package com.yss.vert.eventbus.p2p;
 
+import com.yss.vert.eventbus.Interceptor.Receiver;
+import com.yss.vert.eventbus.Interceptor.Sender;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 

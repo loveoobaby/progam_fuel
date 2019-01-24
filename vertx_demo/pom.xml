@@ -125,6 +125,13 @@
             </properties>
         </profile>
         <profile>
+            <id>interceptor</id>
+            <properties>
+                <profiles.mainClass>com.yss.vert.eventbus.Interceptor.Launcher</profiles.mainClass>
+                <profiles.jarName>vertx-eventbus</profiles.jarName>
+            </properties>
+        </profile>
+        <profile>
             <id>pubsub</id>
             <properties>
                 <profiles.mainClass>com.yss.vert.eventbus.pubsub.PubSub</profiles.mainClass>
