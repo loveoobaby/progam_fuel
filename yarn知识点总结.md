@@ -65,6 +65,10 @@
 
 ​        yarn.nodemanager.remote-app-log-dir设置日志聚合HDFS目录，默认/tmp/logs; 日志聚合目录要有相关的权限
 
+​        yarn.nodemanager.log-dirs: 设置在Container运行时日志保存在NM节点上的位置，默认值是 ${yarn.log.dir}/userrlogs
+
+​	yarn.log-aggregation.retain-seconds：设置多长时间删除聚合后的日志
+
 + 增加或关闭YARN节点
 
   yarn.resourcemanager.nodes.include-path: 指定RM接受节点列表
@@ -83,7 +87,86 @@
 
   yarn rmadmin -refreshUserToGroupsMapping
 
++ 更新RM管理员ACL
+
+  配置项：yarn.admin.acl
+
+  更改后执行：yarn rmadmin -refreshAdminAcl
+
+
+
+## 5. ResourceManager架构
+
+![](./picture/yarn-resource-manager.png)
+
++ Client Service:  实现了客户端接口ApplicationClientProtocol，包括如下操作：
+
+  1. 应用程序提交
+
+  2. 应用程序终止
+  3. 获取应用程序、队列、集群统计信息，用户ACL
+
++ Admin Service：提供管理员操作接口，包括：
+
+  1. 刷新队列：例如，新增队列、停止已有队列，改变队列配置
+  2. 刷新RM管理节点的列表：新增退役节点的刷新
+  3. 添加新用户组，添加/更新管理员ACL，修改超级用户的列表等
+
++ ApplicationMaster Service：响应AM的请求
+
+  1. 注册新的AM
+  2. 终止AM请求
+  3. 获取AM的Container分配和释放请求，异步转发给yarn的调度器
+
++ Resource Tracker Manager：接受NM的RPC，有以下任务：
+
+  1. 注册新节点
+  2. 接收注册节点的心跳
+
++ ApplicationsManager：负责管理已提交的应用集合。
+
++ ApplicationMaster Launcher：负责拉起运行AM的Container；
+
++ ContainerAllocationExpirer：包含了一个已分配但还没有在NM上启动的Container列表。对于任意一个Container，如果在配置的时间内没有启动，RM将该Container当做死亡且超时
+
++ ContainerToken SecretManager：一个Container Token包含以下信息：
+
+  1. Container ID
+  2. NodeManager地址
+  3. 应用程序提交者：提交应用到RM的用户
+  4. 资源：内存、CPU等
+  5. 超时时间戳：决定传递过来的Container令牌是否仍然合法
+  6. RM标识符
+
++ AMRMToken：每个ApplicationAttempt对应一个令牌，用于AM与RM之间的认证。
+
++ NMToken：AM停止Container或获取Container的状态，与NM通信时使用
+
+
+
+## 6. NodeManager
+
++ nodemanager的作用：
+  1. 保持与RM的同步
+  2. 跟踪节点状态
+  3. 管理各个Container的生命周期，监控每个Container的资源使用情况
+  4. 管理分布式缓存
+  5. 管理各个Container生成的日志
 + 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
