@@ -144,17 +144,27 @@
 
 
 
-## 6. NodeManager
+## 6. NodeManager的作用及组件
 
 + nodemanager的作用：
+
   1. 保持与RM的同步
   2. 跟踪节点状态
   3. 管理各个Container的生命周期，监控每个Container的资源使用情况
   4. 管理分布式缓存
   5. 管理各个Container生成的日志
-+ 
 
+  ![](./picture/nodemanager.jpg)
 
++ NodeStatusUpdater:
+  1. NM刚启动时该组件向RM注册
+  2. 向RM提交当前Container信息
+  3. 获取RM指令，例如杀死Container等
++ RPC Server：接受AM启动或停止Container的请求
++ 资源本地化：
+  1. PUBLIC资源本地化：由Public-Localizer线程池处理。当本地化时，localizer验证请求资源的有效性，即通过检查他们在远程文件系统上的permission来检查是否真的可以是PUBLIC。该线程池的数量由yarn.nodemanger.localizer.fetch.thread-count配置
+  2. PRIVATER/APPLICATION资源本地化：不是在nodemanager内部完成，而是在ContainerLocalizer的独立进程中完成的
+  3. 
 
 
 
