@@ -93,7 +93,46 @@
 
   更改后执行：yarn rmadmin -refreshAdminAcl
 
++  yarn RM重启作业保留机制
 
+  1. 启动重启作业恢复，
+
+  ```XML
+  <property>
+      <name>yarn.resourcemanager.recovery.enabled</name>
+      <value>true</value>
+   </property>
+  ```
+
+  2. 配置负责存储RM状态的类，由yarn.resourcemanager.store.class指定，目前有三类配置：
+
+     `org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore`： RM HA配置必须使用该类
+
+     `org.apache.hadoop.yarn.server.resourcemanager.recovery.FileSystemRMStateStore`： 状态数存放在HDFS上，默认配置
+
+     `org.apache.hadoop.yarn.server.resourcemanager.recovery.LeveldbRMStateStore`： 存储在本地levelDB数据库中，相对于前两种较轻量级
+
+  3. 官方文档：https://hadoop.apache.org/docs/r2.7.3/hadoop-yarn/hadoop-yarn-site/ResourceManagerRestart.html#Configure_the_state-store_for_persisting_the_RM_state
+
++ 配置NodeManager支持重启恢复
+
+  ```xml
+  # NM启用重启恢复
+  <property
+      <name>yarn.nodemanager.recovery.enabled</name>
+      <value>true</value>
+   </property>
+  # 存储状态数据的目录
+  <property>
+      <name>yarn.nodemanager.recovery.dir</name>
+      <value><yarn_log_dir_prefix>/nodemanager/recovery-state</value>
+   </property>
+   # RPC地址，防止NM重启端口改变
+   <property>
+      <name>yarn.nodemanager.address</name>
+      <value>0.0.0.0:45454</value>
+   </property>
+  ```
 
 ## 5. ResourceManager架构
 
@@ -164,7 +203,10 @@
 + 资源本地化：
   1. PUBLIC资源本地化：由Public-Localizer线程池处理。当本地化时，localizer验证请求资源的有效性，即通过检查他们在远程文件系统上的permission来检查是否真的可以是PUBLIC。该线程池的数量由yarn.nodemanger.localizer.fetch.thread-count配置
   2. PRIVATER/APPLICATION资源本地化：不是在nodemanager内部完成，而是在ContainerLocalizer的独立进程中完成的
-  3. 
+  3. Containers Launcher: 维护了一个线程池，用于尽快地准备及拉起Container。同时负责清理。
+  4. Container Monitor：在Container整个运行过程中监控它的资源使用率。如果有Container超出它分配值，这个组件会将Container杀死
+  5. Container Executor：与底层操作系统交互，安全地启动和清理Container
+  6. Node Health Checker：通过定期运行配置的脚本，提供对节点的健康检查
 
 
 
