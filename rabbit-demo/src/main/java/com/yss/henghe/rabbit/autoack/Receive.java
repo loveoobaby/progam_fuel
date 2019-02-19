@@ -36,5 +36,6 @@ public class Receive {
         channel.basicConsume(QUEUE_NAME, false, deliverCallback, consumerTag -> {
         });
 
+
     }
 }

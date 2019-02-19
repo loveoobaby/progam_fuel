@@ -1,4 +1,4 @@
-package com.yss.henghe.rabbit.basic;
+package com.yss.henghe.rabbit.confirm;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -7,7 +7,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class Sender {
+public class SenderUseConfirm {
 
     private final static String QUEUE_NAME = "lixingjun";
 
@@ -22,10 +22,20 @@ public class Sender {
 
         channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
-        for(int i=0;i<10;i++){
+        channel.confirmSelect();
+//        channel.queueDeclare()
+
+        for (int i = 0; i < 100000; i++) {
             String message = "" + System.currentTimeMillis();
-            // basicPublish是同步方法，可能阻塞，但并不保证消息一定可以到达MQ，并正确持久化
             channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+            try {
+//                boolean confirm = channel.waitForConfirms();
+                boolean confirm = channel.waitForConfirms(100);
+
+//                System.out.println("confirm result : " + confirm);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         channel.close();
