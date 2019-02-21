@@ -34,6 +34,10 @@
 
 ![](./picture/jvm_heap.png)
 
+当我们调用new指令时，它会在Eden区中划出一块作为存储对象的内存。由于堆空间是线程共享的，因此直接在这里划分空间是需要进行同步的。jvm未避免同步采用TLAB（Thread Local Allocation Buffer，对应虚拟机参数是-XX:+UseTLAB, 默认开启）技术先为每个线程申请一段连续的内存。当new新对象时直接在这段内存中分配，如果这段内存已经用完再重新申请一段Buffer。
+
+
+
 ### 1.3. java栈
 
 +    程执行的基本行为是函数调用，每一次函数调用，都会有一个对应的栈帧入栈，函数调用结束栈帧弹出。当前正在执行的函数对应的帧位于栈顶，保存着当前函数的局部变量、中间运算结果等数据；一个栈帧中至少包含局部变量表、操作数栈和帧数据区；
@@ -167,6 +171,8 @@ jvm运行参数：
 
 ​        如下面的参数： -Xmn2m -XX:SurvivorRatio=2  设置了新生代共2048K，eden空间为1024K，from/to为512K，可用新生代就是1024K+512K=1536K；
 
+​     默认情况下，java虚拟机采取一种动态分配的策略（-XX:+UsePSAdaptiveSurvivorSizePolicy）, 根据生成对象的速率，以及Survivor区的使用情况动态调整Eden和Survivor区的比例。
+
 + 设置老年代与新生代的比例：-XX:+NewRatio=老年代/新生代
 + -XX:+HeapDumpOnOutOfMemoryError: 设置在堆溢出时，导出整个堆信息；
 + -XX:HeapDumpPath=dump file path: 设置导出堆文件的存放路径；
@@ -287,6 +293,181 @@ jvm运行参数：
 ### 5.3 初始化
 
 为标记为常量值的字段赋值，以及执行<clinit>方法的过程。
+
+## 6. Synchronized
+
+声明synchronized代码块时，编译而成的字节码将包含monitorenter和monitorexit指令。当synchronized标记方法时，字节码方法的访问标记包含ACC_SYNCHRONIZED，表示进入方法时执行monitorenter，退出时执行monitorexit。
+
++ 重量级锁
+
+  jvm中最基础的锁实现，在这种情况下，jvm会阻塞加锁失败的线程，当锁释放时唤醒这些线程。这些线程的阻塞和唤醒，都是依靠操作系统完成，将涉及到系统调用，需要从用户态切换到内核态，开销较大。
+
++ 自旋锁
+
+  为了尽量避免线程的阻塞及唤醒，jvm会在线程进入阻塞之前和唤醒之后仍然没有获取锁的情况下，进入自旋状态，在处理器上空跑并且轮询锁是否被释放。如果此时锁恰好被释放了，那么当前线程无需进入阻塞状态，而直接获取这把锁。
+
+  1. 与线程阻塞相比，自旋状态可能浪费大量处理器资源，于是JVM提供了自适应自旋，根据以往自旋等待能否获得锁，来动态调整自旋时间。
+  2. 会造成不公平锁机制。处于阻塞状态的线程并不能立即竞争释放的锁，很可能处于自旋状态的线程优先获取锁。
+
++ 轻量级锁
+
+  ![](./picture/Synchronization.gif)
+
+对象头的mark word最后两位用来表示对象锁的状态。00表示轻量级锁，01代表无锁或偏向锁，10代表重量级锁。当进行加锁操作时，jvm会判断是否是重量级锁。如果不是，它会在当前线程的栈中划出一片空间，作为该锁的锁记录，并将锁对象的标记字段复制到该记录中。它针对的是多个线程在不同时段申请同一把锁的情况。
+
++ 偏向锁
+
+  偏向锁只会在第一次请求时采用CAS操作，在锁对象的标记字段记录下当前线程的地址。之后在运行过程中，持有该偏向锁的线程在加锁操作将直接返回。它针对的是仅会被同一线程持有的情况。
+
+## 7. JMM与happens-before
+
+1. **重排序**：编译器或运行时环境为了优化程序性能而采取的对指令进行重新排序执行的一种手段。重排序分为两类：编译器重排序和运行期重排序，分别对应编译时和运行时环境。但编译器需要保证程序能够遵守as-if-serial属性。通俗来讲，在单线程情况下，经过指令重排的执行结果与顺序执行的结果保持一致。
+
+2. **happens-before**：用来描述两个操作的内存可见性。如果操作X happens-before操作Y，那么X的结果对于Y可见。
+
+   java内存模型定义了下述happens-before关系：
+
+   1. 解锁操作 happens-before 之后对同一把锁的加锁操作。
+
+   2. volatile 字段的写操作 happens-before 之后对同一字段的读操作。
+   3. 线程的启动操作（即 Thread.starts()） happens-before 该线程的第一个操作。
+   4. 线程的最后一个操作 happens-before 它的终止事件（即其他线程通过 Thread.isAlive() 或 Thread.join() 判断该线程是否中止）
+   5. 线程对其他线程的中断操作 happens-before 被中断线程所收到的中断事件（即被中断线程的 InterruptedException 异常，或者第三个线程针对被中断线程的 Thread.interrupted 或者 Thread.isInterrupted 调用)
+   6. 构造器中的最后一个操作 happens-before 析构器的第一个操作
+
+3. 解决数据竞争问题的关键在于构造一个跨线程的happens-before关系：操作X hanppens-before操作Y，使得操作X之前的字节码结果对操作Y之后的字节码可见。
+
+4. java内存模型是通过内存屏障来禁止重排序实现的。对于即时编译器来说，内存屏障将限制它所能做的重排序优化。对于处理器来说，内存屏障会导致缓存的刷新操作。
+
+
+
+## 8. 监控工具
+
+1. vmstat：统计内存CPU的使用情况
+
+   ```shell
+   [root@henghe-125 ~]# vmstat 1 3  //每秒采集一次，共计三次
+   procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+    r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+    1  0      0 9267968   2108 4590508    0    0     0     8    3    1  3  1 96  0  0
+    0  0      0 9267820   2108 4590508    0    0     0     0 1038 1189  0  0 100  0  0
+    0  0      0 9267820   2108 4590508    0    0     0     2  782  919  0  0 100  0  0
+   ```
+
+   | procs  | r：等待运行的进程数  b：处于非中断睡眠状态的进程数           |
+   | :----- | ------------------------------------------------------------ |
+   | memory | swpd：虚拟内存使用情况；free：空闲内存；buff：被用来做缓存的内存数 |
+   | swap   | si：从磁盘交换到内存的交换页数量；so：从内存交换到磁盘的交换页数量 |
+   | IO     | bi：发送到块设备的块数；bo：从块设备接受的块数               |
+   | system | in：每秒的中断数；cs：每秒的上下文切换数                     |
+   | CPU    | us：用户态CPU时间  sy：内核态CPU时间 id：CPU空闲时间         |
+
+2. iostat：监控IO使用情况
+
++ 安装： yum install -y sysstat
+
++ 可以显示cpu和磁盘IO的信息
+
++ ```shell
+  [root@henghe-125 ~]# iostat
+  Linux 3.10.0-862.el7.x86_64 (henghe-125) 	2019年02月21日 	_x86_64_	(6 CPU)
+  
+  avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+             3.30    0.00    1.04    0.00    0.00   95.66
+  
+  Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+  sda               2.83         0.11        49.84     264089  119247303
+  scd0              0.00         0.00         0.00       1028          0
+  dm-0              2.78         0.10        49.27     230889  117879264
+  dm-1              0.00         0.00         0.00       2228          0
+  dm-2              0.15         0.00         0.57       3579    1365913
+  ```
+
+  | tps       | 该设备每秒传输次数   |
+  | --------- | -------------------- |
+  | kB_read/s | 每秒从该设备读取的量 |
+  | kB_wrtn/s | 每秒向该设备写入的量 |
+  | kB_read   | 读取的总量           |
+  | kB_wrtn   | 写入的总量           |
+
+  
+
+3. pidstat：不仅可以监控进程，也可以监控线程
+
++ 查看某个进程中线程占用CPU过高的例子：pidstat -p 22693 -u  -t 1 100，其中22693是PID，-u表示对CPU监控，-t表示监控线程，每秒采集1次，共采集100次
+
+  ![](/Users/yss/work/progam_fuel/picture/pidstat.png)
+
+​       然后再结合jstack -l 22693 > /tmp/th.txt 可以输出线程的堆栈，查找到代码
+
++ 查看某个进程中线程IO过高的例子：pidstat -p 22693 -u  -t 1 100.  -d表示监控IO
+
+  ![](./picture/pidstat-io.png)
+
++ 监控内存的例子：pidstat -r -p 
+
+  ```shell
+  [root@henghe-125 ~]# pidstat -r -p 28138
+  Linux 3.10.0-862.el7.x86_64 (henghe-125) 	2019年02月21日 	_x86_64_	(6 CPU)
+  
+  10时59分43秒   UID       PID  minflt/s  majflt/s     VSZ    RSS   %MEM  Command
+  10时59分43秒  1004     28138      0.02      0.00 11936040 1164680   7.16  java
+  ```
+
+  | minflt/s | 该进程每秒的minor fault（不需要从磁盘中调出内存页）的总数 |
+  | -------- | --------------------------------------------------------- |
+  | majflt/s | 该进程每秒的major fault（需要从磁盘中调出内存页）的总数   |
+  | VSZ      | 使用的虚拟内存大小                                        |
+  | RSS      | 使用的物理内存大小                                        |
+  | %MEM     | 内存占用比例                                              |
+
+
+
+## 9.JDK自带监控工具
+
+1. jstat：查看java运行时相关信息。
+2. jinfo：查看虚拟机参数。
+3. jmap：导出堆文件。
+4. jhat：堆分析工具。
+5. jstack：查看线程堆栈。
+
+
+
+
+
+## 10. OpenJdk的编译
+
+1. 下载openjdk源码，可以从github上clone，官网比较慢
+
+2. 配置参数，具体参数见http://hg.openjdk.java.net/jdk10/jdk10/raw-file/tip/common/doc/building.html#running-configure
+
+   ```shell
+   --with-debug-level=slowdebug 启用slowdebug级别调试
+   --enable-dtrace 启用dtrace
+   --with-jvm-variants=server 编译server类型JVM
+   --with-target-bits=64 指定JVM为64位
+   --enable-ccache 启用ccache，加快编译
+   --with-num-cores=8 编译使用CPU核心数
+   --with-memory-size=8000 编译使用内存
+   --disable-warnings-as-errors 忽略警告
+   --with-boot-jdk=jdkPath 指定boot jdk路径
+   ```
+
+   当前编译JDK的版本是N，那么boot JDK的版本应为N-1，所以如果编译JDK10，boot JDK应该为9。
+
+   我当前环境的例子：
+
+   ```shell
+   sh configure --with-target-bits=64 --with-freetype=/usr/local/Cellar/freetype/2.9.1 --enable-ccache --with-jvm-variants=server,client --with-boot-jdk-jvmargs="-Xlint:deprecation -Xlint:unchecked" --disable-zip-debug-info --disable-warnings-as-errors --with-debug-level=slowdebug --with-boot-jdk=/Users/yss/Downloads/jdk-9.0.4.jdk/Contents/Home
+   ```
+
+3. 执行编译： make images
+
+4. 验证是否编译成功
+
+   ./build/macosx-x86_64-normal-serverANDclient-slowdebug/jdk/bin/java -version
+
+
 
 
 
