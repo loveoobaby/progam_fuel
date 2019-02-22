@@ -22,7 +22,7 @@ public class Sender {
 
         channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
-        for(int i=0;i<10;i++){
+        for(int i=0;i<1000000;i++){
             String message = "" + i;
             channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
         }

@@ -44,14 +44,17 @@ public class RPCClient implements AutoCloseable {
     public static void main(String[] argv) {
         try (RPCClient fibonacciRpc = new RPCClient()) {
             fibonacciRpc.init();
-            for (int i = 0; i < 100000; i++) {
+            long init = System.currentTimeMillis();
+            for (int i = 0; i < 10000; i++) {
                 long start = System.currentTimeMillis();
-                String i_str = Integer.toString(i%10);
-                System.out.println(" [x] Requesting fib(" + i_str + ")");
+                String i_str = Integer.toString(8);
+//                System.out.println(" [x] Requesting fib(" + i_str + ")");
                 String response = fibonacciRpc.call(i_str);
-                System.out.println(" [.] Got '" + response + "' " + (System.currentTimeMillis() - start));
+//                System.out.println(" [.] Got '" + response + "' " + (System.currentTimeMillis() - start));
 //                Thread.sleep(20*1000);
+//                System.out.println(i);
             }
+            System.out.println(" [.] Got '" + "' " + (System.currentTimeMillis() - init));
         } catch (IOException | TimeoutException | InterruptedException e) {
             e.printStackTrace();
         }

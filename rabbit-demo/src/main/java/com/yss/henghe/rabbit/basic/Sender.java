@@ -22,10 +22,11 @@ public class Sender {
 
         channel.queueDeclare(QUEUE_NAME, true, false, false, null);
 
-        for(int i=0;i<10;i++){
+        for(int i=0;i<100000;i++){
             String message = "" + System.currentTimeMillis();
             // basicPublish是同步方法，可能阻塞，但并不保证消息一定可以到达MQ，并正确持久化
             channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+            System.out.println(i);
         }
 
         channel.close();

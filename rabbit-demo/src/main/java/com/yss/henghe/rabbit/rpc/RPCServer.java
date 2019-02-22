@@ -38,6 +38,7 @@ public class RPCServer {
                 String response = "";
 
                 try {
+//                    System.out.println(delivery.getProperties());
                     String message = new String(delivery.getBody(), "UTF-8");
                     int n = Integer.parseInt(message);
 
@@ -46,6 +47,7 @@ public class RPCServer {
                 } catch (RuntimeException e) {
                     System.out.println(" [.] " + e.toString());
                 } finally {
+                    System.out.println(response);
                     channel.basicPublish("", delivery.getProperties().getReplyTo(), replyProps, response.getBytes("UTF-8"));
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                     // RabbitMq consumer worker thread notifies the RPC server owner thread
