@@ -396,11 +396,11 @@ jvm运行参数：
 
 + 查看某个进程中线程占用CPU过高的例子：pidstat -p 22693 -u  -t 1 100，其中22693是PID，-u表示对CPU监控，-t表示监控线程，每秒采集1次，共采集100次
 
-  ![](/Users/yss/work/progam_fuel/picture/pidstat.png)
+  ![](./picture/pidstat.png)
 
 ​       然后再结合jstack -l 22693 > /tmp/th.txt 可以输出线程的堆栈，查找到代码
 
-+ 查看某个进程中线程IO过高的例子：pidstat -p 22693 -u  -t 1 100.  -d表示监控IO
++ 查看某个进程中线程IO过高的例子：pidstat -p 22693 -d  -t 1 100  -d表示监控IO
 
   ![](./picture/pidstat-io.png)
 
@@ -466,6 +466,44 @@ jvm运行参数：
 4. 验证是否编译成功
 
    ./build/macosx-x86_64-normal-serverANDclient-slowdebug/jdk/bin/java -version
+
+### 11. Class文件结构
+
+![](./picture/class_file_struct.png)
+
+根据Java虚拟机规范，一个Class文件可以描述为：
+
+```shell
+ClassFile {
+        类型            名称                数量           描述
+        u4             magic                1          魔数
+        u2             minor_version        1          次版本号
+        u2             major_version        1          主版本号
+        u2             constant_pool_count  1          常量池容量
+        cp_info        constant_pool  costant_pool_count-1   常量池
+        u2             access_flags         1            访问标志
+        u2             this_class           1            当前类常量索引
+        u2             super_class          1            超类常量索引
+        u2             interfaces_count     1            接口数量
+        u2             interfaces  interfaces_count      接口常量索引
+        u2             fields_count         1            字段数量
+        field_info      fields        fields_count        字段信息
+        u2             methods_count        1            方法数量
+        method_info     methods            methods_count  方法信息
+        u2             attributes_count     1            属性数量
+        attribute_info attributes    attributes_count    属性信息
+}
+```
+
+一个字节码的例子：
+
+![](./picture/class_code_example.png)
+
+在本例子中：
+
+- 魔数是：0xcafebabe
+- 小版本好是0，大版本号是0x34=52，表示是1.8编译的
+- 常量池的大小是0x20-1=31
 
 
 
