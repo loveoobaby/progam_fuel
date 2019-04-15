@@ -45,7 +45,23 @@
 2. 当Feign接口的方法被调用时，通过JDK的代理方式，生成具体的RequestTemplate对象，该对象封装了HTTP请求的全部信息。
 3. 然后RequestTemplate生成Request，然后把Request交给Client处理。这里的Client可以是JDK原生的URLConnection、Apache的Http Client，也可以是okhttp。最后Client被封装到LoadBalanceClient，这个类结合Ribbon负载均衡发起服务之间的调用。
 
+## 2.2 FeignClient注解
 
+FeignClient注解的常用属性：
+
+1. name：Client的名称，如果项目中使用了Robbin，name属性会作为微服务的名称用于服务发现；
+
+2. url：手动指定Client的调用地址，多用于调式
+
+3. decode404：当发生404错误时，如果该字段为true，会调用decoder进行解码，否则抛出FeignException
+
+4. configuration：Feign配置类，可以自定义Feign的Encoder、Decoder、LogLevel、Contract
+
+5. fallback：定义容错处理类，该类必须实现@FeignClient修饰的接口
+
+6. fallbackFactory：工厂类，用于生成fallback类实例
+
+   
 
 # 3. Ribbon负载均衡策略
 
@@ -61,7 +77,39 @@
 
 
 
+# 4. Hystrix
+
+## 4.1 接口启用断路器
+
+1. 在启动类加上@EnableHystrix注解
+
+2. 在需要熔断降级的接口上加入@HystrixCommand注解
+
+```java
+ @Service
+ public class MyHystrixClient {
+       @Autowired
+       private RestTemplate restTemplate;
 
 
+   @HystrixCommand(fallbackMethod = "myFallback")
+   public String simpleHystrixClientCall(long time) {
+       return restTemplate.getForEntity("http://CLOUD-HYSTRIX-SERVICE/hystrix/simple?time=" + time, String.class).getBody();
+   }
+   
+   /**
+    * 方法simpleHystrixClientCall的回退方法，可以指定将hystrix执行失败异常传入到方法中
+    * @param p ystrix执行失败的传入方法的请求
+    * @param e hystrix执行失败的异常对象
+    * @return
+    */
+   String myFallback(long p, Throwable e) {
+       return "Execute raw fallback: access service fail , req= " + p + " reason = " + e;
+   }
+ }
+```
 
+## 4.2 Feign中使用Hystrix
+
+在feign中，默认是自带Hystrix功能的，在很多老版本中是默认打开的，从最近的几个版本开始默认关闭，需要自己通过配置文件打开。
 
