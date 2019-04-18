@@ -1,0 +1,9 @@
+
+server:
+  port: 8099
+
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/test
