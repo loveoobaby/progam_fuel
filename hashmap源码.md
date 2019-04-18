@@ -132,6 +132,14 @@ public HashMap() {
 
 
 
+# 3. HashTable
+
+hashtable的实现几乎与hashmap一致，除了hashtable是线程安全的，方法都由synchronized修饰
+
+
+
+
+
 
 
 
