@@ -95,6 +95,66 @@ public class OrderService {
 
 
 
+# 5. 常用注解
+
+## 5.1项目配置类注解
+
++ **@SpringBootApplication 注解**：这是一个复合注解，包含了**@SpringBootConfiguration，@EnableAutoConfiguration，@ComponentScan**这三个注解。
+
++ **@SpringBootConfiguration**：标注当前类是配置类，这个注解继承自**@Configuration**，并会将当前类内声明一个或多个以@bean标注的方法实例纳入到spring容器中，并且实例名就是方法名。
+
++ **@EnableAutoConfiguration**：自动装配注解，这个注解会根据添加的组件jar来完成一系列默认配置。
+
++ **@ComponentScan**:扫描当前包及其子包下被@Component，@Controller，@Service，@Repository注解标记的类并纳入到spring容器中进行管理
+
++ **@ServletComponentScan**： Servlet、Filter、Listener 可以直接通过 @WebServlet、@WebFilter、@WebListener 注解自动注册。这个注解定义包扫描的范围。
+
++ **@MapperScan**: spring-boot支持mybatis组件的一个注解，通过此注解指定mybatis接口类的路径，即可完成对mybatis接口的扫描。当然需要添加响应的依赖：
+
+  ```XML
+  <dependency>
+     <groupId>org.mybatis.spring.boot</groupId>
+     <artifactId>mybatis-spring-boot-starter</artifactId>
+     <version>RELEASE</version>
+  </dependency>
+  ```
+
+## 5.2 资源导入注解
+
++ **@ImportResource(locations={}) **导入其他xml配置文件，需要标准在主配置类上。导入property的配置文件 **@PropertySource**指定文件路径，这个相当于使用spring的**<importresource/>**标签来完成配置项的引入。
+
++ **@import**注解是一个可以将普通类导入到spring容器中做管理
+
+## 5.3 Controller层注解
+
++ **@Controller **表明这个类是一个控制器类，和**@RequestMapping**来配合使用拦截请求
++ **@RestController** 是@Controller 和@ResponseBody的结合，一个类被加上@RestController 注解，数据接口中就不再需要添加@ResponseBody
++ **@CrossOrigin:@CrossOrigin(origins = "", maxAge = 1000) **这个注解主要是为了解决跨域访问的问题。这个注解可以为整个controller配置启用跨域，也可以在方法级别启用。
+
+## 5.4  Servcie层注解
+
++ **@Service：**这个注解用来标记业务层的组件，我们会将业务逻辑处理的类都会加上这个注解交给spring容器。事务的切面也会配置在这一层。
+
+## 5.5 持久层注解
+
++ **@Repository**：@Repository注解类作为DAO对象，管理操作数据库的对象。总得来看，@Component, @Service, @Controller, @Repository是spring注解，注解后可以被spring框架所扫描并注入到spring容器来进行管理。@Component是通用注解，其他三个注解是这个注解的拓展，并且具有了特定的功能。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
