@@ -1,6 +1,6 @@
 ### 1. LockSupport字段
 
-LockSupport是JUC并发支持类，提供锁机制与线程的阻塞唤醒的工具类。
+LockSupport是JUC并发支持类，提供线程的阻塞唤醒的工具类。
 
 先看其字段部分：
 
