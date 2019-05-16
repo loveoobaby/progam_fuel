@@ -449,8 +449,6 @@ jvm运行参数：
 
 
 
-
-
 ## 10. OpenJdk的编译
 
 1. 下载openjdk源码，可以从github上clone，官网比较慢
@@ -606,9 +604,70 @@ Class必须在使用时才会被装载，虚拟机不会无条件装载Class。
 
 
 
-## 13. 
+## 13. OOM问题排除思路
+
+OOM的产生一般分成两种情况：内存溢出和内存泄漏。内存溢出是程序分配的内存超出物理机的内存大小，导致无法继续分配内存。内存泄漏是不再使用的对象一直占据着内存，导致内存浪费，久而久之，内存泄漏的对象越来越多，导致物理机内存耗尽。
+
+1. 导出内存镜像：jmap -dump:format=b,file=<导出目录+文件名> <进程号>
+
+2. 使用MAT工具分析内存镜像
+
+   将内存镜像导入到MAT中，选择Leak Suspects Report，进入分析页面
+
+   Histogram：列表展示出内存中的对象数目和占用内存大小
+
+   Dominator Tree：列表展示出程序中每个线程中的对象数目和占用内存大小
+
+   
+
+   **Top Consumers：图表展示出每个线程的对象数目和占用内存大小**
+
+   **Top Components：图表展示出内存中的对象数目和占用内存大小**
+
+   **Leak Suspects：这个是最常用的，会自动检测分析内存异常的原因**
+
+   
+
+   右键对象-->show objects by class可以查看对象的具体情况
+
+   by incomming reference：显示引用该对象/线程的其他对象
+
+   by outgoing reference：显示当前对象/线程引用的其他对象
 
 
+
+
+
+### 14. MAT在Mac上的启动
+
+以默认方式在mac上启动MAT会碰到一下错误：
+
+```java
+java.lang.IllegalStateException: The platform metadata area could not be written: /private/var/folders/5h/4d0c8p1d6cg0f223h2k79qp80000gn/T/AppTranslocation/DAC7ED7A-CB22-4A78-AA63-A609D4E23377/d/mat.app/Contents/MacOS/workspace/.metadata.  By default the platform writes its content
+under the current working directory when the platform is launched.  Use the -data parameter to
+specify a different content area for the platform.
+ 
+```
+
+此时需要在mat.app/Contents/Eclipse/MemoryAnalyzer.ini中新增-data配置
+
+```ini
+-startup
+../Eclipse/plugins/org.eclipse.equinox.launcher_1.5.0.v20180512-1130.jar
+-data
+/Users/yss/.eclipse/log
+--launcher.library
+../Eclipse/plugins/org.eclipse.equinox.launcher.cocoa.macosx.x86_64_1.1.700.v20180518-1200
+-vmargs
+-Xmx1024m
+-Dorg.eclipse.swt.internal.carbon.smallFonts
+-XstartOnFirstThread
+```
+
+注意：
+
+- data参数和路径必须在两个不同的行
+- data参数必须放在Laucher之前，否则启动还是不成功
 
 
 
