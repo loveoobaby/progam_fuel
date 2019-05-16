@@ -9,7 +9,7 @@
 
 ### 2. TCP包头格式
 
-![](./picture/tcp-packet.png)
+![](./picture/tcp_package_head.png)
 
 + 源端口和目标端口用于确定双方通信的进程；
 + 报文序号：用于解决乱序问题；
@@ -19,11 +19,36 @@
   2. ACK：确认，使得确认号有效；
   3. RST：重置连接，经常见到的reset by peer就是这个字段搞的鬼
   4. FIN：结束连接，发送方结束向对方发消息
+  5. PSH: 有数据传输
 + 窗口大小：TCP要做流量控制，通信双方各申明一个窗口，标识自己的处理能力
 
 TCP包头比较复杂，但是主要关注顺序问题、丢包问题、连接维护、流量控制、拥塞控制；
 
+下面对一个真实的数据包进行分析
 
+```C
+c2 35 1f 99 e5 84 e8 af 00 00 00 00 b0 02 ff ff
+fe 34 00 00 02 04 3f d8 01 03 03 05 01 01 08 0a
+2d 14 a4 93 00 00 00 00 04 02 00 00
+```
+
++ c2 35是源端口，转换成十进制即49717
+
++ 1f 99是目标端口即8089
+
++ e5 84 e8 af是sequence number
+
++ 00 00 00 00是acknowledge number
+
++ b0 02是数据偏移、保留位及状态位，转换成二进制是1011000000000010。机1011是Data Offset，000000是保留位，000010是状态位，这个包是一个SYN包。
+
++ ff ff是window的大小
+
++ fe 34校验和
+
++ 00 00： urgent pointer
+
+  
 
 ### 3. TCP的三次握手
 
@@ -60,6 +85,50 @@ TCP四次挥手过程：
 
 ![](./picture/tcp_state_m)
 
+
+
+### 6. Linux下基于TCP服务端编程流程
+
+1. 创建一个socket， 用函数socket()
+2. 绑定IP地址、端口等信息到socket上，用函数bind()
+3. 设置允许的最大连接数，用函数listen()
+4. 接收客户端上来的连接，用函数accept()
+5. 收发数据，用函数send()和recv()， 或者read()、 write()
+6. 关闭网络连接
+
+
+
+### 7. Linux下基于TCP的客户端编程流程
+
+1. 创建一个socket， 用函数socket()
+2. 设置要连接的对方的IP地址、端口等信息
+3. 连接服务器，用函数connect()
+4. 收发数据，用函数send()和recv(), 或者read()、 write()
+5. 关闭连接
+
+
+
+### 8. Socket编程API
+
+1. listen： int listen(int socketed, int backlog)
+
+   第一个参数是要监听的socket描述符
+
+   第二个参数是可以排队的最大连接数
+
+   scoket函数创建的socket默认是一个主动类型的，listen函数将socket变成被动类型，等待客户的连接请求
+
+2. connect函数：客户端调用此函数连接服务器
+
+   int connect(int socktfd，const struct sockaddr *addr, socklen_t addrlen)
+
+   第一个参数是客户端的socket描述符
+
+   第二个参数是服务器的socket地址
+
+   第三个参数是socket地址的长度
+
+   
 
 
 
