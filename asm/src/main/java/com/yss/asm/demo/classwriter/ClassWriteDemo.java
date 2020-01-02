@@ -1,5 +1,6 @@
-package com.yss.asm.demo;
+package com.yss.asm.demo.classwriter;
 
+import com.yss.asm.demo.Utils;
 import org.objectweb.asm.ClassWriter;
 
 import java.io.*;

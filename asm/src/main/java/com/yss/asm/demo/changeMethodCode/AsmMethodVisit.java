@@ -1,4 +1,4 @@
-package com.yss.asm.demo.method;
+package com.yss.asm.demo.changeMethodCode;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -31,7 +31,7 @@ public class AsmMethodVisit extends MethodVisitor {
             // pushes the "Hello World!" String constant
             mv.visitLdcInsn("this is a modify method!");
             // invokes the 'println' method (defined in the PrintStream class)
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
         }
         super.visitInsn(opcode);
     }

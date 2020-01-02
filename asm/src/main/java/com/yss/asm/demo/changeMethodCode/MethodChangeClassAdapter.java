@@ -1,4 +1,4 @@
-package com.yss.asm.demo.method;
+package com.yss.asm.demo.changeMethodCode;
 
 
 import org.objectweb.asm.ClassVisitor;
@@ -13,11 +13,6 @@ public class MethodChangeClassAdapter extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-        //当方法名为execute时，修改方法名为execute1
-        if (cv != null && "execute".equals(name)){
-            return cv.visitMethod(access, name + "1", descriptor, signature, exceptions);
-        }
-
         //此处的changeMethodContent即为需要修改的方法  ，修改方法內容
         if("changeMethodContent".equals(name)){
             //先得到原始的方法

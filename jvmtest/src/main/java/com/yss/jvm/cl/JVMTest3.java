@@ -10,6 +10,7 @@ import java.util.UUID;
 public class JVMTest3 {
     public static void main(String[] args) {
         System.out.println(Parent3.str);
+        System.out.println(Parent33.str);
     }
 }
 
@@ -18,5 +19,13 @@ class Parent3 {
 
     static {
         System.out.println("Parent3 static code");
+    }
+}
+
+class Parent33 {
+    public static final String str = "hello world";
+
+    static {
+        System.out.println("Parent33 static code");
     }
 }
