@@ -1,6 +1,6 @@
-package com.yss.jvm.classloader;
+package com.yss.jvm.cl.classloader;
 
-import com.yss.jvm.classloader.MyClassLoader;
+import com.yss.jvm.cl.classloader.MyClassLoader;
 
 public class ClassUnloadTest {
     public static void main(String[] args) throws Exception {

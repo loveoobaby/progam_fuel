@@ -1,4 +1,4 @@
-package com.yss.jvm;
+package com.yss.jvm.cl;
 
 public class JVMTest8 {
     public static void main(String[] args) throws ClassNotFoundException {

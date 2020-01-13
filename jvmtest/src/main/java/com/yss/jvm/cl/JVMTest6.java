@@ -1,4 +1,4 @@
-package com.yss.jvm;
+package com.yss.jvm.cl;
 
 /**
  * 连接阶段中的准备阶段是给类的静态变量赋予默认值，

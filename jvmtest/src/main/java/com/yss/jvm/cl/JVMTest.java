@@ -1,6 +1,5 @@
 package com.yss.asm.demo.staticfield;
 
-import org.apache.logging.log4j.core.util.JsonUtils;
 
 /**
  * ldc： 将int、float、String从常量池中推送到栈顶
