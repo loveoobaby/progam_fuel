@@ -1,0 +1,161 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'java'
+    id 'groovy'
+    id 'application'
+}
+
+description = "metrics-demo application"
+group = "com.yss.metrics"
+version = "1.0-SNAPSHOT"
+mainClassName = 'com.yss.metrics.App'
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+ext {
+    versions = [
+        tapestry: "5.5.0-beta-3",
+        tapestryTestify: "1.0.4",
+        tapestryXpath: "1.0.1",
+        geb: "2.3.1",
+        groovy: "2.5.6",
+        htmlunitDriver: "2.33.3",
+        jackson: "2.9.6",
+        json: "1.1.2",
+        selenium: "3.141.59",
+        servletApi: "3.0.1",
+        spock: "1.3-RC1-groovy-2.5",
+        springBoot: "2.1.3.RELEASE",
+        yasson: "1.0.1"
+    ]
+}
+
+repositories {
+    mavenCentral()
+    maven {
+      url 'https://repository.apache.org/content/repositories/staging/'
+    }
+}
+
+configurations {
+    provided
+    testUnitTapestryCompile.extendsFrom(testImplementation, provided)
+    testUnitTapestryRuntime.extendsFrom(testRuntimeOnly, provided)
+    testFunctionalTapestryCompile.extendsFrom(testImplementation, provided)
+    testFunctionalTapestryRuntime.extendsFrom(testRuntimeOnly, provided)
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+        // To give the same path as IDEA has
+        // output.resourcesDir = 'build/production/metrics-demo'
+        // output.classesDir = 'build/production/metrics-demo'
+    }
+    test {
+        compileClasspath += configurations.provided
+        runtimeClasspath += configurations.provided
+        groovy {
+            exclude '**/tapestry/unit/**'
+            exclude '**/tapestry/functional/**'
+        }
+    }
+    testUnitTapestry {
+        groovy.srcDir file('src/test/groovy')
+        resources.srcDir file('src/test/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath + configurations.provided
+        runtimeClasspath += output + compileClasspath + configurations.provided
+        groovy {
+            include '**/tapestry/unit/**'
+        }
+    }
+    testFunctionalTapestry {
+        groovy.srcDir file('src/test/groovy')
+        resources.srcDir file('src/test/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath + configurations.provided
+        runtimeClasspath += output + compileClasspath + configurations.provided
+        groovy {
+            include '**/tapestry/functional/**'
+        }
+    }
+}
+
+dependencies {
+    implementation platform("org.springframework.boot:spring-boot-dependencies:${versions.springBoot}")
+
+    // Spring Boot
+    def excludeSpringBootStarterLogging = { exclude(group: 'org.springframework.boot', module: 'spring-boot-starter-logging') }
+
+    implementation("org.springframework.boot:spring-boot-starter", excludeSpringBootStarterLogging)
+    implementation("org.springframework.boot:spring-boot-starter-web", excludeSpringBootStarterLogging)
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
+
+    // Apache Tapestry
+    implementation("org.apache.tapestry:tapestry-core:${versions.tapestry}")
+
+    // CoffeeScript & Less support, plus resource minification
+    implementation("org.apache.tapestry:tapestry-webresources:${versions.tapestry}")
+
+    // Uncomment this to add support for spring, hibernate, bean validation and uploads
+    //implementation("org.apache.tapestry:tapestry-spring:$versions.tapestry")
+    //implementation("org.apache.tapestry:tapestry-hibernate:$versions.tapestry")
+    //implementation("org.apache.tapestry:tapestry-beanvalidator:$versions.tapestry")
+    //implementation("org.apache.tapestry:tapestry-upload:${tapestry}")
+
+    // Test
+    def excludeTestng = { exclude(group: 'org.testng'); }
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test", excludeSpringBootStarterLogging)
+    testImplementation("org.spockframework:spock-core:${versions.spock}")
+    testImplementation("org.spockframework:spock-spring:${versions.spock}")
+    testImplementation("org.codehaus.groovy:groovy-all:${versions.groovy}", excludeTestng)
+
+    // Test Unit Tapestry
+    testUnitTapestryCompile("org.apache.tapestry:tapestry-test:${versions.tapestry}", excludeTestng)
+    testUnitTapestryCompile("net.sourceforge.tapestrytestify:tapestry-testify:${versions.tapestryTestify}", excludeTestng)
+    testUnitTapestryCompile("net.sourceforge.tapestryxpath:tapestry-xpath:${versions.tapestryXpath}", excludeTestng)
+
+    // Test Functional Tapestry
+    testFunctionalTapestryCompile("org.gebish:geb-spock:${versions.geb}")
+    testFunctionalTapestryCompile("org.seleniumhq.selenium:selenium-support:${versions.selenium}")
+    testFunctionalTapestryCompile("org.seleniumhq.selenium:htmlunit-driver:${versions.htmlunitDiver}")
+
+    // Miscellaneous
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
+    runtimeOnly("org.eclipse:yasson:${versions.yasson}")
+    runtimeOnly("org.glassfish:javax.json:${versions.json}")
+    runtimeOnly("com.fasterxml.jackson.core:jackson-databind:${versions.jackson}")
+    runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}")
+
+    provided("javax.servlet:javax.servlet-api:${versions.servletApi}")
+}
+
+run {
+    systemProperty 'tapestry.execution-mode', System.getProperty('tapestry.execution-mode')
+}
+
+test {
+}
+
+task testUnitTapestry(type: Test) {
+    group = 'Verification'
+    description = 'Runs the tapestry unit tests.'
+    systemProperty 'tapestry.service-reloading-enabled', 'false'
+    systemProperty 'tapestry.execution-mode', 'development'
+    systemProperty 'geb.driver', 'htmlunit'
+    testClassesDirs = sourceSets.testUnitTapestry.output.classesDirs
+    classpath = project.sourceSets.testUnitTapestry.runtimeClasspath
+    include '**/*Spec*'
+}
+
+task testFunctionalTapestry(type: Test) {
+    group = 'Verification'
+    description = 'Runs the tapestry functional tests.'
+    systemProperty 'tapestry.service-reloading-enabled', 'false'
+    systemProperty 'tapestry.execution-mode', 'development'
+    systemProperty 'geb.driver', 'htmlunit'
+    testClassesDirs = sourceSets.testFunctionalTapestry.output.classesDirs
+    classpath = project.sourceSets.testFunctionalTapestry.runtimeClasspath
+}
