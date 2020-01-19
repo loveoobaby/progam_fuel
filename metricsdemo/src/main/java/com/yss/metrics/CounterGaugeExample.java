@@ -15,11 +15,9 @@ import java.util.concurrent.TimeUnit;
 public class CounterGaugeExample {
 
     private static final MetricRegistry registy = new MetricRegistry();
-    private static final ConsoleReporter reporter = ConsoleReporter.forRegistry(registy).
-            convertRatesTo(TimeUnit.SECONDS)
-            .convertDurationsTo(TimeUnit.SECONDS).build();
+    private static final ConsoleReporter reporter = ConsoleReporter.forRegistry(registy).build();
 
-    private static final BlockingDeque<Long> queue = new LinkedBlockingDeque<>(100);
+    private static final BlockingDeque<Long> queue = new LinkedBlockingDeque<>(100000);
 
     public static void main(String[] args) {
         Counter counter = registy.counter("queue-counter", Counter::new);
@@ -34,25 +32,25 @@ public class CounterGaugeExample {
             }
         }).start();
 
-        new Thread(()->{
-            for (;;){
-
-                try {
-                    queue.take();
+//        new Thread(()->{
+//            for (;;){
+//
+//                try {
 //                    queue.take();
-//                    queue.take();
-                    counter.dec();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-//                randomSleep();
-            }
-        }).start();
+////                    queue.take();
+////                    queue.take();
+//                    counter.dec();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+////                randomSleep();
+//            }
+//        }).start();
     }
 
     private static void randomSleep(){
         try {
-            TimeUnit.SECONDS.sleep(ThreadLocalRandom.current().nextInt(10));
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
