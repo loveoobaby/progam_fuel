@@ -12,6 +12,7 @@ public interface ServletContainerInitializer {
 }
 ```
 
+
 + 这个接口实现类就是servlet容器与spring web框架的连接点。程序在执行时就可以从Tomcat等容器进入到Spring的代码上来。
 
 
