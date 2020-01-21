@@ -19,9 +19,6 @@ package com.yss.grpc.helloworld;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import io.grpc.examples.helloworld.GreeterGrpc;
-import io.grpc.examples.helloworld.HelloReply;
-import io.grpc.examples.helloworld.HelloRequest;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -96,8 +93,11 @@ public class HelloWorldClient {
       if (args.length > 0) {
         user = args[0];
       }
-      client.greet(user);
-      client.greetAgain(user);
+      for (int i = 0; i < 10; i++) {
+        client.greet(user);
+        client.greetAgain(user);
+      }
+
     } finally {
       client.shutdown();
     }
