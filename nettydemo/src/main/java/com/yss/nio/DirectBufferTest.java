@@ -6,13 +6,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-/*
-    通过NIO读取文件的步骤：
-      1. 从FileInputStream中获取到FileChannel对象
-      2. 创建Buffer
-      3. 将数据读取到Buffer中
- */
-public class NioTest4 {
+public class DirectBufferTest {
 
     public static void main(String[] args) throws IOException {
         FileInputStream in = new FileInputStream("NioTest2.txt");
@@ -20,7 +14,7 @@ public class NioTest4 {
         FileChannel inchannel = in.getChannel();
         FileChannel outChannel = output.getChannel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(1);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(1);
         while (true){
             buffer.clear();
             int read = inchannel.read(buffer);
