@@ -1,0 +1,18 @@
+management:
+  endpoints:
+    web:
+      exposure:
+         include: "*"
+
+
+# H2 DB - "db1"
+db1:
+  datasource:
+    url: jdbc:h2:mem:db1
+    username: postgres
+
+db2:
+  datasource:
+    url: jdbc:h2:mem:db2
+    username: postgres
+
