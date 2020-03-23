@@ -8,18 +8,37 @@
 		<version>2.2.4.RELEASE</version>
 	</parent>
 
-	<groupId>com.yss.devtools</groupId>
-	<artifactId>devtools-demo</artifactId>
+	<groupId>com.yss.swagger2</groupId>
+	<artifactId>swagger2-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
 		<java.version>1.8</java.version>
+		<swagger.version>2.9.2</swagger.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
