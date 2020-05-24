@@ -1,0 +1,12 @@
+mirror.bit.edu.cn 0.0303919315338
+mirrors.njupt.edu.cn 0.0715770721436
+mirrors.tuna.tsinghua.edu.cn 0.040785074234
+mirror.lzu.edu.cn 0.0488028526306
+ftp.sjtu.edu.cn 0.0297710895538
+mirrors.cn99.com 0.0281219482422
+mirrors.huaweicloud.com 0.0195128917694
+mirrors.neusoft.edu.cn 0.0569200515747
+mirrors.nju.edu.cn 0.0867519378662
+mirrors.163.com 0.0658161640167
+mirrors.aliyun.com 0.0535769462585
+mirrors.bfsu.edu.cn 0.0355229377747

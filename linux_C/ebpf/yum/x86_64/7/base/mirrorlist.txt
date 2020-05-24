@@ -1,0 +1,10 @@
+http://mirrors.njupt.edu.cn/centos/7.8.2003/os/x86_64/
+http://mirrors.aliyun.com/centos/7.8.2003/os/x86_64/
+http://mirror.lzu.edu.cn/centos/7.8.2003/os/x86_64/
+http://mirrors.cn99.com/centos/7.8.2003/os/x86_64/
+http://mirror.bit.edu.cn/centos/7.8.2003/os/x86_64/
+http://mirrors.huaweicloud.com/centos/7.8.2003/os/x86_64/
+http://mirrors.neusoft.edu.cn/centos/7.8.2003/os/x86_64/
+http://mirrors.163.com/centos/7.8.2003/os/x86_64/
+http://ftp.sjtu.edu.cn/centos/7.8.2003/os/x86_64/
+http://mirrors.nju.edu.cn/centos/7.8.2003/os/x86_64/
