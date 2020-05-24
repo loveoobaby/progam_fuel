@@ -1,11 +1,12 @@
-extern :main.o stack.o
-	cc -o extern stack.o main.o
+objects = main.o stack.o
+cc = gcc -Wall
 
-stack.o :stack.c
-	cc -c stack.c
+extern : $(objects)
+	$(cc) -o extern $(objects)
 
-main.o :main.c
-	cc -c main.c
+stack.o : 
+main.o :
 
+.PHONY : clean
 clean :
 	rm -rf *.o extern
